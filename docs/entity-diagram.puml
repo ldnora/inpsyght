@@ -1,0 +1,77 @@
+@startuml
+entity "User" {
+  id : UUID
+  nickname : string
+  password_hash : string
+  email_hash : string [optional]
+  created_at : datetime
+}
+
+entity "Form" {
+  id : integer
+  title : string
+  description : text
+  version : string
+  created_at : datetime
+  published : boolean
+}
+
+entity "Factor" {
+  id : integer
+  name : string
+  description : text
+}
+
+entity "Facet" {
+  id : integer
+  name : string
+  description : text
+}
+
+entity "Question" {
+  id : integer
+  text : text
+}
+
+entity "Alternative" { 
+  id: integer [1-5]
+  description: text
+}
+
+entity "Answer" {
+  id : UUID
+  value : integer [1-5]
+  created_at : datetime
+}
+
+entity "Question_Feedback" {
+  id : integer
+  low_text : text
+  medium_text : text
+  high_text : text
+}
+
+entity "Facet_Feedback" { 
+  id: integer
+  definition: text
+  features: text
+  advantage: text
+  desavantage: text
+}
+
+User --{ Answer
+
+Form --{ Question
+Form --{ Factor
+
+Factor --{ Facet
+Factor --{ Question
+
+Facet --{ Question
+Facet --{ Facet_Feedback
+
+Question -- Answer
+Question --{ Alternative
+Question -- Question_Feedback
+
+@enduml
