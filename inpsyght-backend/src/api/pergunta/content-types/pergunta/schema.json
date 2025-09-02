@@ -10,5 +10,12 @@
     "draftAndPublish": true
   },
   "pluginOptions": {},
-  "attributes": {}
+  "attributes": {
+    "id_pergunta": {
+      "type": "uid"
+    },
+    "texto": {
+      "type": "text"
+    }
+  }
 }

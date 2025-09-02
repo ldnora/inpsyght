@@ -387,6 +387,7 @@ export interface ApiFacetaFaceta extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    feedback: Schema.Attribute.Relation<'oneToOne', 'api::feedback.feedback'>;
     feedback_alto: Schema.Attribute.Text;
     feedback_baixo: Schema.Attribute.Text;
     feedback_medio: Schema.Attribute.Text;
@@ -515,6 +516,7 @@ export interface ApiPerguntaPergunta extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    id_pergunta: Schema.Attribute.UID;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -522,6 +524,7 @@ export interface ApiPerguntaPergunta extends Struct.CollectionTypeSchema {
     > &
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
+    texto: Schema.Attribute.Text;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

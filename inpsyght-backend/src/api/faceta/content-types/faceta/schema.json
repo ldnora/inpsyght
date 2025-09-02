@@ -30,6 +30,11 @@
       "type": "relation",
       "relation": "oneToMany",
       "target": "api::pergunta.pergunta"
+    },
+    "feedback": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::feedback.feedback"
     }
   }
 }
