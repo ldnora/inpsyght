@@ -1,0 +1,14 @@
+{
+  "kind": "collectionType",
+  "collectionName": "perguntas",
+  "info": {
+    "singularName": "pergunta",
+    "pluralName": "perguntas",
+    "displayName": "Pergunta"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {}
+}

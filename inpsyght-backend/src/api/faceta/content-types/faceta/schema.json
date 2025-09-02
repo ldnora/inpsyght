@@ -1,0 +1,14 @@
+{
+  "kind": "collectionType",
+  "collectionName": "facetas",
+  "info": {
+    "singularName": "faceta",
+    "pluralName": "facetas",
+    "displayName": "Faceta"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {}
+}

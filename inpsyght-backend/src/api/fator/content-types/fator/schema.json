@@ -1,0 +1,14 @@
+{
+  "kind": "collectionType",
+  "collectionName": "fatores",
+  "info": {
+    "singularName": "fator",
+    "pluralName": "fatores",
+    "displayName": "Fator"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {}
+}
