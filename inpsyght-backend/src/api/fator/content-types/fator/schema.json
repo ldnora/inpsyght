@@ -10,5 +10,25 @@
     "draftAndPublish": true
   },
   "pluginOptions": {},
-  "attributes": {}
+  "attributes": {
+    "id_fator": {
+      "type": "uid"
+    },
+    "nome_fator": {
+      "type": "string"
+    },
+    "facetas": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::faceta.faceta",
+      "private": true
+    },
+    "formularios": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::formulario.formulario",
+      "private": true,
+      "inversedBy": "fatores"
+    }
+  }
 }

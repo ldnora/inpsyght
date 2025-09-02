@@ -387,12 +387,18 @@ export interface ApiFacetaFaceta extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    feedback_alto: Schema.Attribute.Text;
+    feedback_baixo: Schema.Attribute.Text;
+    feedback_medio: Schema.Attribute.Text;
+    id_faceta: Schema.Attribute.UID;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
       'api::faceta.faceta'
     > &
       Schema.Attribute.Private;
+    nome_faceta: Schema.Attribute.String;
+    perguntas: Schema.Attribute.Relation<'oneToMany', 'api::pergunta.pergunta'>;
     publishedAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -414,8 +420,48 @@ export interface ApiFatorFator extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    facetas: Schema.Attribute.Relation<'oneToMany', 'api::faceta.faceta'> &
+      Schema.Attribute.Private;
+    formularios: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::formulario.formulario'
+    > &
+      Schema.Attribute.Private;
+    id_fator: Schema.Attribute.UID;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::fator.fator'> &
+      Schema.Attribute.Private;
+    nome_fator: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiFeedbackFeedback extends Struct.CollectionTypeSchema {
+  collectionName: 'feedbacks';
+  info: {
+    displayName: 'feedback';
+    pluralName: 'feedbacks';
+    singularName: 'feedback';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    feedback_geral_alto: Schema.Attribute.Blocks;
+    feedback_geral_baixo: Schema.Attribute.Text;
+    feedback_geral_medio: Schema.Attribute.Text;
+    id_feedback: Schema.Attribute.UID;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::feedback.feedback'
+    > &
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
@@ -439,6 +485,8 @@ export interface ApiFormularioFormulario extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     descricao: Schema.Attribute.Text;
+    fatores: Schema.Attribute.Relation<'manyToMany', 'api::fator.fator'> &
+      Schema.Attribute.Private;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -991,6 +1039,7 @@ declare module '@strapi/strapi' {
       'admin::user': AdminUser;
       'api::faceta.faceta': ApiFacetaFaceta;
       'api::fator.fator': ApiFatorFator;
+      'api::feedback.feedback': ApiFeedbackFeedback;
       'api::formulario.formulario': ApiFormularioFormulario;
       'api::pergunta.pergunta': ApiPerguntaPergunta;
       'plugin::content-releases.release': PluginContentReleasesRelease;

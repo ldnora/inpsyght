@@ -1,0 +1,27 @@
+{
+  "kind": "collectionType",
+  "collectionName": "feedbacks",
+  "info": {
+    "singularName": "feedback",
+    "pluralName": "feedbacks",
+    "displayName": "feedback"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "id_feedback": {
+      "type": "uid"
+    },
+    "feedback_geral_baixo": {
+      "type": "text"
+    },
+    "feedback_geral_medio": {
+      "type": "text"
+    },
+    "feedback_geral_alto": {
+      "type": "blocks"
+    }
+  }
+}

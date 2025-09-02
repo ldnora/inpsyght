@@ -16,6 +16,13 @@
     },
     "descricao": {
       "type": "text"
+    },
+    "fatores": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::fator.fator",
+      "private": true,
+      "mappedBy": "formularios"
     }
   }
 }

@@ -10,5 +10,26 @@
     "draftAndPublish": true
   },
   "pluginOptions": {},
-  "attributes": {}
+  "attributes": {
+    "id_faceta": {
+      "type": "uid"
+    },
+    "nome_faceta": {
+      "type": "string"
+    },
+    "feedback_baixo": {
+      "type": "text"
+    },
+    "feedback_medio": {
+      "type": "text"
+    },
+    "feedback_alto": {
+      "type": "text"
+    },
+    "perguntas": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::pergunta.pergunta"
+    }
+  }
 }
