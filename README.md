@@ -1,6 +1,6 @@
-# UFSM - Projeto de Software 1 - Jardim Botânico
+# UFSM - Projeto de Software 2 - CAED
 
-Integrantes: [Leonardo Krugel](https://github.com/lckrugel) e [Marcelo Azevedo](https://github.com/mdazevedo96)
+Integrantes: [Leandro Dalla Nora ](), [Marcelo Azevedo](https://github.com/mdazevedo96), [Lorenzo Comunello]() e [Jean ...]() 
 
 ## Requisitos
 
@@ -28,13 +28,11 @@ E então abra [http://localhost:3000](http://localhost:3000) no browser para ver
 
 ## Repositório
 
-Estão bloqueados `push` para a branch `main` pois esta branch é usada para o deploy automático para produção.
 
-Vamos manter a branch `dev` para desenvolvimento e testagem de funcionalidades antes de serem enviadas para `main`.
 
 ## Deploy
 
-Deploy automático feito na Vercel, plano gratuito (Hobby).
+
 
 ## Recursos adicionais
 
