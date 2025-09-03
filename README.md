@@ -45,3 +45,4 @@ Deploy automático feito na Vercel, plano gratuito (Hobby).
 - [Tutorial de Tailwind css](https://www.youtube.com/watch?v=7mt89PPWhaY) - Tutorial no yt (pt-br).
 - [Tutorial de Next.js + Tailwind](https://www.youtube.com/watch?v=69vpmZgDeN8) - Tutorial no yt (inglês).
 # ps2-formulario-bigfive
+# ps2-formulario-bigfive
