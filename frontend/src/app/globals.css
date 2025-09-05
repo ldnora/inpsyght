@@ -1,0 +1,86 @@
+@import "tailwindcss";
+
+body {
+  background-color: #f7faf7;
+  @apply min-h-screen text-gray-800;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  @apply font-bold;
+}
+
+input, textarea, select {
+  @apply border rounded px-3 py-2 focus:outline-none focus:ring-2 bg-white;
+  border-color: #61ce70;
+  --tw-ring-color: #61ce70;
+}
+
+button {
+  @apply transition-colors duration-200;
+  color: #2d3e2d;
+}
+
+button:hover {
+  background-color: #4bb85a;
+}
+
+button.button-icon-action, .button-icon-action {
+  background: transparent !important;
+  color: #2d3e2d;
+  transition: color 0.2s;
+  box-shadow: none;
+}
+button.button-icon-action:hover, .button-icon-action:hover {
+  background: transparent !important;
+}
+
+.container {
+  @apply max-w-4xl mx-auto px-4 sm:px-6;
+}
+
+/* Card styles */
+.card {
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 4px 24px 0 rgba(97, 206, 112, 0.10), 0 1.5px 6px 0 rgba(44, 62, 45, 0.06);
+  padding: 1.5rem 1rem;
+  margin-bottom: 0.5rem;
+  border: 1.5px solid #e6f4ea;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+@media (min-width: 640px) {
+  .card {
+    padding: 2rem 1.5rem;
+  }
+}
+
+.card:hover {
+  box-shadow: 0 8px 32px 0 rgba(97, 206, 112, 0.18), 0 2px 8px 0 rgba(44, 62, 45, 0.10);
+  border-color: #61ce70;
+}
+
+.card-title {
+  font-size: 1.2rem;
+  color: #2d3e2d;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 640px) {
+  .card-title {
+    font-size: 1.4rem;
+  }
+}
+
+.icon {
+  font-size: 1.3em;
+}
+
+@media (min-width: 640px) {
+  .icon {
+    font-size: 1.5em;
+  }
+}
