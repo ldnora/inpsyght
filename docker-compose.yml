@@ -25,7 +25,7 @@ services:
       - ./inpsyght-backend/package-lock.json:/opt/inpsyght-backend/package-lock.json
 
       - .env:/opt/app/.env
-      - ./public/uploads:/opt/app/public/uploads
+      - ./inpsyght-backend/public/uploads:/opt/app/public/uploads
     ports:
       - '1337:1337'
     networks:
