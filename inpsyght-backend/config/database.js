@@ -1,20 +1,18 @@
 const fs = require('fs');
 const path = require('path');
 
+console.log('✅ Carregando configuração customizada do banco de dados (database.js)...');
+
 module.exports = ({ env }) => ({
   connection: {
     client: 'postgres',
+    // O Strapi irá priorizar a connectionString se ela existir.
+    // Os outros parâmetros (host, port, etc.) servirão como fallback.
     connection: {
-      host: env('DATABASE_HOST', '127.0.0.1'),
-      port: env.int('DATABASE_PORT', 5432),
-      database: env('DATABASE_NAME', 'strapi'),
-      user: env('DATABASE_USERNAME', 'strapi'),
-      password: env('DATABASE_PASSWORD', 'strapi'),
+      connectionString: env('DATABASE_URL'), // <-- Usando a nova variável do .env
       ssl: {
-        ca: fs.readFileSync(path.join(__dirname, 'certs/supabase-ca.crt')).toString(),
-        
-        
-        rejectUnauthorized: true, 
+        // Mantemos esta opção como uma garantia para contornar o firewall.
+        rejectUnauthorized: false,
       },
     },
     debug: false,
