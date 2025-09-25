@@ -12,16 +12,19 @@
   "pluginOptions": {},
   "attributes": {
     "Nome": {
-      "type": "string"
+      "type": "string",
+      "required": true
     },
     "descricao": {
       "type": "text"
     },
-    "fatores": {
+    "id_formulario": {
+      "type": "uid"
+    },
+    "fators": {
       "type": "relation",
       "relation": "manyToMany",
       "target": "api::fator.fator",
-      "private": true,
       "mappedBy": "formularios"
     }
   }

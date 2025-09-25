@@ -387,10 +387,11 @@ export interface ApiFacetaFaceta extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    feedback: Schema.Attribute.Relation<'oneToOne', 'api::feedback.feedback'>;
-    feedback_alto: Schema.Attribute.Text;
-    feedback_baixo: Schema.Attribute.Text;
-    feedback_medio: Schema.Attribute.Text;
+    descricao: Schema.Attribute.Text;
+    feedback_geral: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::feedback-geral.feedback-geral'
+    >;
     id_faceta: Schema.Attribute.UID;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
@@ -398,7 +399,7 @@ export interface ApiFacetaFaceta extends Struct.CollectionTypeSchema {
       'api::faceta.faceta'
     > &
       Schema.Attribute.Private;
-    nome_faceta: Schema.Attribute.String;
+    nome: Schema.Attribute.String;
     perguntas: Schema.Attribute.Relation<'oneToMany', 'api::pergunta.pergunta'>;
     publishedAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
@@ -426,13 +427,12 @@ export interface ApiFatorFator extends Struct.CollectionTypeSchema {
     formularios: Schema.Attribute.Relation<
       'manyToMany',
       'api::formulario.formulario'
-    > &
-      Schema.Attribute.Private;
+    >;
     id_fator: Schema.Attribute.UID;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::fator.fator'> &
       Schema.Attribute.Private;
-    nome_fator: Schema.Attribute.String;
+    nome: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -440,12 +440,13 @@ export interface ApiFatorFator extends Struct.CollectionTypeSchema {
   };
 }
 
-export interface ApiFeedbackFeedback extends Struct.CollectionTypeSchema {
-  collectionName: 'feedbacks';
+export interface ApiFeedbackGeralFeedbackGeral
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'feedbacks_gerais';
   info: {
-    displayName: 'feedback';
-    pluralName: 'feedbacks';
-    singularName: 'feedback';
+    displayName: 'feedback_geral';
+    pluralName: 'feedbacks-gerais';
+    singularName: 'feedback-geral';
   };
   options: {
     draftAndPublish: true;
@@ -455,13 +456,13 @@ export interface ApiFeedbackFeedback extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     feedback_geral_alto: Schema.Attribute.Blocks;
-    feedback_geral_baixo: Schema.Attribute.Text;
-    feedback_geral_medio: Schema.Attribute.Text;
-    id_feedback: Schema.Attribute.UID;
+    feedback_geral_baixo: Schema.Attribute.RichText;
+    feedback_geral_medio: Schema.Attribute.Blocks;
+    id_feedback_geral: Schema.Attribute.UID;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
-      'api::feedback.feedback'
+      'api::feedback-geral.feedback-geral'
     > &
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
@@ -486,15 +487,15 @@ export interface ApiFormularioFormulario extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     descricao: Schema.Attribute.Text;
-    fatores: Schema.Attribute.Relation<'manyToMany', 'api::fator.fator'> &
-      Schema.Attribute.Private;
+    fators: Schema.Attribute.Relation<'manyToMany', 'api::fator.fator'>;
+    id_formulario: Schema.Attribute.UID;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
       'api::formulario.formulario'
     > &
       Schema.Attribute.Private;
-    Nome: Schema.Attribute.String;
+    Nome: Schema.Attribute.String & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -516,6 +517,9 @@ export interface ApiPerguntaPergunta extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    feedback_alto: Schema.Attribute.RichText;
+    feedback_baixo: Schema.Attribute.Blocks;
+    feedback_medio: Schema.Attribute.RichText;
     id_pergunta: Schema.Attribute.UID;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
@@ -523,8 +527,9 @@ export interface ApiPerguntaPergunta extends Struct.CollectionTypeSchema {
       'api::pergunta.pergunta'
     > &
       Schema.Attribute.Private;
+    pontuacao_reversa: Schema.Attribute.Boolean;
     publishedAt: Schema.Attribute.DateTime;
-    texto: Schema.Attribute.Text;
+    texto: Schema.Attribute.Text & Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1042,7 +1047,7 @@ declare module '@strapi/strapi' {
       'admin::user': AdminUser;
       'api::faceta.faceta': ApiFacetaFaceta;
       'api::fator.fator': ApiFatorFator;
-      'api::feedback.feedback': ApiFeedbackFeedback;
+      'api::feedback-geral.feedback-geral': ApiFeedbackGeralFeedbackGeral;
       'api::formulario.formulario': ApiFormularioFormulario;
       'api::pergunta.pergunta': ApiPerguntaPergunta;
       'plugin::content-releases.release': PluginContentReleasesRelease;

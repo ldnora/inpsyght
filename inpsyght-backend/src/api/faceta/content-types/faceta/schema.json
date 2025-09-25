@@ -14,16 +14,10 @@
     "id_faceta": {
       "type": "uid"
     },
-    "nome_faceta": {
+    "nome": {
       "type": "string"
     },
-    "feedback_baixo": {
-      "type": "text"
-    },
-    "feedback_medio": {
-      "type": "text"
-    },
-    "feedback_alto": {
+    "descricao": {
       "type": "text"
     },
     "perguntas": {
@@ -31,10 +25,10 @@
       "relation": "oneToMany",
       "target": "api::pergunta.pergunta"
     },
-    "feedback": {
+    "feedback_geral": {
       "type": "relation",
       "relation": "oneToOne",
-      "target": "api::feedback.feedback"
+      "target": "api::feedback-geral.feedback-geral"
     }
   }
 }

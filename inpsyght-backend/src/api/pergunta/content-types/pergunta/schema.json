@@ -15,7 +15,20 @@
       "type": "uid"
     },
     "texto": {
-      "type": "text"
+      "type": "text",
+      "required": true
+    },
+    "pontuacao_reversa": {
+      "type": "boolean"
+    },
+    "feedback_baixo": {
+      "type": "blocks"
+    },
+    "feedback_medio": {
+      "type": "richtext"
+    },
+    "feedback_alto": {
+      "type": "richtext"
     }
   }
 }
