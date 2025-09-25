@@ -1,24 +1,24 @@
 {
   "kind": "collectionType",
-  "collectionName": "feedbacks",
+  "collectionName": "feedbacks_gerais",
   "info": {
-    "singularName": "feedback",
-    "pluralName": "feedbacks",
-    "displayName": "feedback"
+    "singularName": "feedback-geral",
+    "pluralName": "feedbacks-gerais",
+    "displayName": "feedback_geral"
   },
   "options": {
     "draftAndPublish": true
   },
   "pluginOptions": {},
   "attributes": {
-    "id_feedback": {
+    "id_feedback_geral": {
       "type": "uid"
     },
     "feedback_geral_baixo": {
-      "type": "text"
+      "type": "richtext"
     },
     "feedback_geral_medio": {
-      "type": "text"
+      "type": "blocks"
     },
     "feedback_geral_alto": {
       "type": "blocks"

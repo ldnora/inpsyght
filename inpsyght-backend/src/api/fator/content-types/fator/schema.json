@@ -14,7 +14,7 @@
     "id_fator": {
       "type": "uid"
     },
-    "nome_fator": {
+    "nome": {
       "type": "string"
     },
     "facetas": {
@@ -27,8 +27,7 @@
       "type": "relation",
       "relation": "manyToMany",
       "target": "api::formulario.formulario",
-      "private": true,
-      "inversedBy": "fatores"
+      "inversedBy": "fators"
     }
   }
 }
