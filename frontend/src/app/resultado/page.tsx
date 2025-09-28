@@ -1,26 +1,36 @@
-import Link from "next/link";
-import ResultadoChart from "@/components/ResultadoChart";
+"use client";
+import { useEffect, useState } from "react";
+
+interface Resposta {
+  perguntaId: number;
+  texto: string;
+  resposta: number;
+  feedback: string;
+}
 
 export default function ResultadoPage() {
-  // Mock dos resultados (0–100)
-  const scores = [70, 85, 60, 75, 40];
+  const [respostas, setRespostas] = useState<Resposta[]>([]);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("respostas");
+    if (saved) setRespostas(JSON.parse(saved));
+  }, []);
 
   return (
-    <div className="max-w-md mx-auto mt-20 p-6 border rounded-lg shadow text-center">
-      <h2 className="text-xl font-bold mb-6">Seu Perfil de Personalidade</h2>
-      
-      <div className="mb-6">
-        <ResultadoChart scores={scores} />
-      </div>
+    <div className="max-w-2xl mx-auto mt-10 p-6 border rounded-lg shadow">
+      <h2 className="text-2xl font-bold mb-6">Resultado</h2>
 
-      <div className="flex justify-around">
-        <button className="px-4 py-2 border rounded hover:bg-gray-100">
-          Exportar relatório
-        </button>
-        <Link href="/" className="px-4 py-2 border rounded hover:bg-gray-100">
-          Voltar ao Início
-        </Link>
-      </div>
+      {respostas.map((r, i) => (
+        <div key={i} className="mb-6">
+          <p className="font-semibold">
+            Pergunta {i + 1}: {r.texto}
+          </p>
+          <p className="text-gray-700">Sua resposta: {r.resposta}</p>
+          <div className="mt-2 p-3 bg-gray-100 rounded">
+            <p className="italic text-blue-800">{r.feedback}</p>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
