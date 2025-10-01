@@ -13,6 +13,7 @@
     "@prisma/client": "^6.5.0",
     "@supabase/supabase-js": "^2.49.4",
     "chart.js": "^4.5.0",
+    "lucide-react": "^0.544.0",
     "naughty-words": "^1.2.0",
     "next": "15.2.4",
     "qrcode": "^1.5.4",
