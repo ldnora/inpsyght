@@ -129,13 +129,13 @@ export default function Resultado() {
               <Legend
                 verticalAlign="top"
                 align="center"
-                payload={[
-                  {
-                    value: "Seus Resultados",
-                    type: "square",
-                    color: strokeColor,
-                  },
-                ]}
+                content={() => (
+                  <div style={{ textAlign: "center" }}>
+                    <span style={{ color: strokeColor }}>
+                      Seus Resultados
+                    </span>
+                  </div>
+                )}
               />
             </RadarChart>
           </ResponsiveContainer>
@@ -181,10 +181,7 @@ export default function Resultado() {
 
         {/* Tabela de respostas */}
         <section aria-labelledby="titulo-respostas">
-          <h3
-            id="titulo-respostas"
-            className="text-xl font-semibold mb-4"
-          >
+          <h3 id="titulo-respostas" className="text-xl font-semibold mb-4">
             Suas Respostas
           </h3>
           <div className="overflow-x-auto">
@@ -204,7 +201,10 @@ export default function Resultado() {
               </thead>
               <tbody>
                 {respostas.map((r, idx) => (
-                  <tr key={idx} className="hover:bg-gray-50 dark:hover:bg-gray-800">
+                  <tr
+                    key={idx}
+                    className="hover:bg-gray-50 dark:hover:bg-gray-800"
+                  >
                     <td className="border p-3">
                       {r.pergunta ?? `Pergunta ${r.perguntaId}`}
                     </td>
@@ -228,7 +228,9 @@ export default function Resultado() {
         >
           <button
             onClick={() =>
-              alert("Exportar relatório: implementar export conforme necessário.")
+              alert(
+                "Exportar relatório: implementar export conforme necessário."
+              )
             }
             className="px-6 py-3 border rounded text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
           >

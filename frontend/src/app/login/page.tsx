@@ -10,7 +10,6 @@ export default function LoginPage() {
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    // Check for logout success message
     const message = searchParams.get('message');
     if (message) {
       setStatusMessage(message);
