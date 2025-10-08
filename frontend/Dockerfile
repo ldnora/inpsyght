@@ -7,8 +7,6 @@ COPY prisma ./prisma/
 
 RUN npm install
 
-RUN npx prisma generate
-
 COPY . .
 
 ENV PORT=3000
