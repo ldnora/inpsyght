@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { fetchPerguntas } from "@/libs/api";
 
 type Pergunta = {
   id: number;
@@ -8,6 +9,7 @@ type Pergunta = {
   feedback_baixo: string;
   feedback_medio: string;
   feedback_alto: string;
+  pontuacao_reversa?: boolean;
 };
 
 type Resposta = {
@@ -19,36 +21,37 @@ type Resposta = {
 };
 
 export default function Formulario() {
+  const [perguntas, setPerguntas] = useState<Pergunta[]>([]);
   const [index, setIndex] = useState(0);
   const [respostas, setRespostas] = useState<Resposta[]>([]);
   const [selecionada, setSelecionada] = useState<number | null>(null);
+  const [carregando, setCarregando] = useState(true);
 
-  const perguntas: Pergunta[] = [
-    {
-      id: 1,
-      texto: "Gosto de estar rodeado de pessoas.",
-      area: "Extroversão",
-      feedback_baixo: "Você tende a ser mais reservado.",
-      feedback_medio: "Você é equilibrado entre momentos sociais e pessoais.",
-      feedback_alto: "Você é muito sociável e comunicativo.",
-    },
-    {
-      id: 2,
-      texto: "Costumo planejar minhas atividades com antecedência.",
-      area: "Conscienciosidade",
-      feedback_baixo: "Pode ter dificuldade em organização.",
-      feedback_medio: "Você mantém algum equilíbrio entre flexibilidade e organização.",
-      feedback_alto: "Você é altamente organizado e disciplinado.",
-    },
-    {
-      id: 3,
-      texto: "Tenho facilidade em me adaptar a novas ideias.",
-      area: "Abertura à Experiência",
-      feedback_baixo: "Prefere seguir rotinas e tradições.",
-      feedback_medio: "Equilibra novidades com estabilidade.",
-      feedback_alto: "Gosta muito de novidades e criatividade.",
-    },
-  ];
+  useEffect(() => {
+    async function carregarPerguntas() {
+      const data = await fetchPerguntas();
+      setPerguntas(data);
+      setCarregando(false);
+    }
+    carregarPerguntas();
+  }, []);
+
+  if (carregando)
+    return (
+      <main className="flex h-screen items-center justify-center">
+        <p>Carregando perguntas...</p>
+      </main>
+    );
+
+  if (perguntas.length === 0)
+    return (
+      <main className="flex h-screen items-center justify-center">
+        <p>Nenhuma pergunta encontrada.</p>
+      </main>
+    );
+
+  const perguntaAtual = perguntas[index];
+  const progresso = ((index + 1) / perguntas.length) * 100;
 
   const legendaRespostas: { [key: number]: string } = {
     1: "Discordo totalmente",
@@ -57,9 +60,6 @@ export default function Formulario() {
     4: "Concordo",
     5: "Concordo totalmente",
   };
-
-  const perguntaAtual = perguntas[index];
-  const progresso = ((index + 1) / perguntas.length) * 100;
 
   const handleResposta = (resposta: number) => {
     setSelecionada(resposta);
@@ -80,13 +80,15 @@ export default function Formulario() {
     const novasRespostas = [...respostas, novaResposta];
     setRespostas(novasRespostas);
 
-    setTimeout(() => {
+    setTimeout(async () => {
       if (index < perguntas.length - 1) {
         setIndex(index + 1);
         setSelecionada(null);
       } else {
         localStorage.setItem("respostas", JSON.stringify(novasRespostas));
-        window.location.href = "/resultado";
+        requestAnimationFrame(() => {
+          window.location.href = "/resultado";
+        });
       }
     }, 400);
   };
@@ -95,14 +97,16 @@ export default function Formulario() {
     <div className="min-h-screen flex flex-col bg-gray-100 dark:bg-gray-900">
       <main className="flex flex-1 items-center justify-center px-6">
         <div className="bg-white dark:bg-gray-800 shadow-lg rounded-xl p-8 w-full max-w-xl">
-          {/* Barra de progresso acessível */}
+          {/* Barra de progresso */}
           <div
             className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 mb-6 overflow-hidden"
             role="progressbar"
             aria-valuenow={index + 1}
             aria-valuemin={1}
             aria-valuemax={perguntas.length}
-            aria-label={`Progresso: pergunta ${index + 1} de ${perguntas.length}`}
+            aria-label={`Progresso: pergunta ${index + 1} de ${
+              perguntas.length
+            }`}
           >
             <div
               className="bg-green-500 h-3 transition-all duration-500"
@@ -112,21 +116,16 @@ export default function Formulario() {
 
           <form>
             <fieldset>
-              <legend
-                className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-6"
-                id="pergunta-legenda"
-              >
+              <legend className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-6">
                 Pergunta {index + 1} de {perguntas.length}
               </legend>
               <p className="text-xl text-gray-700 dark:text-gray-200 mb-6">
                 {perguntaAtual.texto}
               </p>
 
-              {/* Escala de 1 a 5 com legenda */}
               <div
                 className="grid grid-cols-5 gap-4 text-center"
                 role="radiogroup"
-                aria-labelledby="pergunta-legenda"
               >
                 {[1, 2, 3, 4, 5].map((valor) => (
                   <label
@@ -148,7 +147,9 @@ export default function Formulario() {
                       aria-label={`${valor} - ${legendaRespostas[valor]}`}
                     />
                     <span className="text-lg">{valor}</span>
-                    <span className="text-xs mt-2">{legendaRespostas[valor]}</span>
+                    <span className="text-xs mt-2">
+                      {legendaRespostas[valor]}
+                    </span>
                   </label>
                 ))}
               </div>
