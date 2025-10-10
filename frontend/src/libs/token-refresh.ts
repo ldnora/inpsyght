@@ -1,10 +1,8 @@
-import type { PrismaClient } from "@prisma/client/extension";
 import { createClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 
 export async function refreshSupabaseToken(): Promise<{
   success: boolean;
-  client?: PrismaClient;
   error?: string;
 }> {
   const cookieStore = await cookies();
@@ -48,20 +46,7 @@ export async function refreshSupabaseToken(): Promise<{
       });
     }
 
-    // Return new client with refreshed token
-    const newClient = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        global: {
-          headers: {
-            Authorization: `Bearer ${data.session.access_token}`,
-          },
-        },
-      }
-    );
-
-    return { success: true, client: newClient };
+    return { success: true };
   } catch (error) {
     console.error("Token refresh error:", error);
     return { success: false, error: "Token refresh failed" };

@@ -1,31 +1,50 @@
-export async function fetchPerguntas() {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+// src/lib/api.ts
+import qs from "qs";
 
-  try {
-    const res = await fetch(`${baseUrl}/api/perguntas`, {
-      headers: {
-        "Content-Type": "application/json",
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:1337/api";
+
+export async function getFormularios() {
+  const query = qs.stringify(
+    {
+      fields: ["id_formulario", "Nome", "descricao"],
+    },
+    { encodeValuesOnly: true }
+  );
+
+  const res = await fetch(`${API_URL}/formularios?${query}`);
+  return await res.json();
+}
+
+export async function getFormularioCompleto(id: string) {
+  const query = qs.stringify(
+    {
+      populate: {
+        fields: ["Nome", "descricao"],
+        fators: {
+          fields: ["nome"],
+          populate: {
+            facetas: {
+              fields: ["nome"],
+              populate: {
+                perguntas: {
+                  fields: [
+                    "texto",
+                    "feedback_baixo",
+                    "feedback_medio",
+                    "feedback_alto",
+                    "pontuacao_reversa",
+                  ],
+                },
+              },
+            },
+          },
+        },
       },
-    });
+    },
+    { encodeValuesOnly: true }
+  );
 
-    if (!res.ok) throw new Error(`Erro ao buscar perguntas: ${res.statusText}`);
 
-    const json = await res.json();
-    return json.data.map((item: any) => ({
-      id: item.id,
-      texto: item.texto,
-      area: item.area ?? "Sem área definida",
-      feedback_baixo: Array.isArray(item.feedback_baixo)
-        ? item.feedback_baixo
-            .map((b: any) => b.children?.map((c: any) => c.text).join(" "))
-            .join(" ")
-        : item.feedback_baixo ?? "",
-      feedback_medio: item.feedback_medio ?? "",
-      feedback_alto: item.feedback_alto ?? "",
-      pontuacao_reversa: item.pontuacao_reversa ?? false,
-    }));
-  } catch (err) {
-    console.error(err);
-    return [];
-  }
+  const res = await fetch(`${API_URL}/formularios/${id}?${query}`);
+  return await res.json();
 }
