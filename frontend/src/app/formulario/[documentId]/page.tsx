@@ -10,7 +10,7 @@ type RichTextChild = {
 };
 
 type RichTextBlock = {
-  type: string; // ex: "paragraph"
+  type: string;
   children?: RichTextChild[];
 };
 
@@ -47,7 +47,6 @@ type FormularioResponse = {
   data: FormularioAPI;
 };
 
-// Tipos internos da página
 type Pergunta = {
   id: string;
   texto: string;
@@ -81,7 +80,6 @@ export default function FormularioPage() {
   const [selecionada, setSelecionada] = useState<number | null>(null);
   const [carregando, setCarregando] = useState(true);
 
-  // Função para extrair perguntas do JSON da API
   function extrairPerguntas(formData: FormularioResponse): Pergunta[] {
     const todasPerguntas: Pergunta[] = [];
     const fators = formData.data.fators || [];
@@ -140,7 +138,12 @@ export default function FormularioPage() {
           documentId as string
         );
         if (cache.respostas.length > 0) {
-          setIndex(cache.respostas.length);
+          // Garante que o índice não ultrapasse o número de perguntas
+          const proximoIndice = Math.min(
+            cache.respostas.length,
+            perguntasExtraidas.length - 1
+          );
+          setIndex(proximoIndice);
         }
       } catch (err) {
         console.error("Erro ao carregar formulário:", err);
@@ -167,6 +170,7 @@ export default function FormularioPage() {
     );
 
   const perguntaAtual = perguntas[index];
+
   const progresso = ((index + 1) / perguntas.length) * 100;
 
   const legenda: Record<1 | 2 | 3 | 4 | 5, string> = {
@@ -194,14 +198,16 @@ export default function FormularioPage() {
       factorId: perguntaAtual.factorId,
     });
 
-    setTimeout(() => {
-      if (index < perguntas.length - 1) {
+    // Check if this is the last question before incrementing
+    if (index < perguntas.length - 1) {
+      setTimeout(() => {
         setIndex(index + 1);
         setSelecionada(null);
-      } else {
-        window.location.href = `/resultado/${documentId}`;
-      }
-    }, 300);
+      }, 300);
+    } else {
+      // Redirect immediately for the last question
+      window.location.href = `/resultado/${documentId}`;
+    }
   };
 
   return (

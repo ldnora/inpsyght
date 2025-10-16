@@ -1,4 +1,3 @@
-// src/lib/api.ts
 import qs from "qs";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:1337/api";
@@ -15,7 +14,7 @@ export async function getFormularios() {
   return await res.json();
 }
 
-export async function getFormularioCompleto(id: string) {
+export async function getFormularioCompleto(documentId: string) {
   const query = qs.stringify(
     {
       populate: {
@@ -44,7 +43,6 @@ export async function getFormularioCompleto(id: string) {
     { encodeValuesOnly: true }
   );
 
-
-  const res = await fetch(`${API_URL}/formularios/${id}?${query}`);
+  const res = await fetch(`${API_URL}/formularios/${documentId}?${query}`);
   return await res.json();
 }
