@@ -85,7 +85,7 @@ export default function ResultadoPage() {
 
       try {
         console.log("Carregando dados para documentId:", documentId);
-        
+
         // Carregar formulário e respostas em paralelo
         const [formData, cache] = await Promise.all([
           getFormularioCompleto(documentId as string),
@@ -97,7 +97,9 @@ export default function ResultadoPage() {
 
         // Verificar se há respostas antes de prosseguir
         if (!cache || cache.respostas.length === 0) {
-          console.log("Nenhuma resposta encontrada, redirecionando para o formulário...");
+          console.log(
+            "Nenhuma resposta encontrada, redirecionando para o formulário..."
+          );
           // Usar setTimeout para garantir que o redirecionamento aconteça
           setTimeout(() => {
             router.push(`/formulario/${documentId}`);
@@ -110,7 +112,11 @@ export default function ResultadoPage() {
           formData.data,
           cache.respostas
         );
-        console.log("Resultados calculados:", resultadosCalculados.length, "fatores");
+        console.log(
+          "Resultados calculados:",
+          resultadosCalculados.length,
+          "fatores"
+        );
         setResultados(resultadosCalculados);
       } catch (err) {
         console.error("Erro ao carregar resultados:", err);
@@ -151,10 +157,7 @@ export default function ResultadoPage() {
       });
 
       if (facetasResultado.length > 0) {
-        const somaFator = facetasResultado.reduce(
-          (acc, f) => acc + f.media,
-          0
-        );
+        const somaFator = facetasResultado.reduce((acc, f) => acc + f.media, 0);
         const mediaFator = somaFator / facetasResultado.length;
 
         resultados.push({
@@ -182,95 +185,125 @@ export default function ResultadoPage() {
     setGerandoPDF(true);
 
     try {
-      const html2canvas = (await import("html2canvas")).default;
-      const jsPDF = (await import("jspdf")).default;
-
-      // Esconder os botões temporariamente
-      const botoesContainer = relatorioRef.current.querySelector('.print\\:hidden');
-      if (botoesContainer) {
-        (botoesContainer as HTMLElement).style.display = 'none';
+      // Usar window.print() é mais confiável que html2canvas
+      const printWindow = window.open("", "_blank");
+      if (!printWindow) {
+        alert("Por favor, permita pop-ups para gerar o PDF.");
+        return;
       }
 
-      // Aguardar um pouco para garantir que o DOM está pronto
-      await new Promise(resolve => setTimeout(resolve, 100));
+      const content = relatorioRef.current.cloneNode(true) as HTMLElement;
 
-      const canvas = await html2canvas(relatorioRef.current, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        backgroundColor: "#f3f4f6",
-        ignoreElements: (element) => {
-          // Ignorar elementos com classes que causam problemas
-          return element.classList.contains('print:hidden') || 
-                 element.tagName === 'BUTTON';
-        },
-        onclone: (clonedDoc) => {
-          // Forçar cores RGB em vez de oklch
-          const style = clonedDoc.createElement('style');
-          style.textContent = `
-            * {
-              color-scheme: light !important;
-            }
-            .dark\\:bg-gray-800 { background-color: #1f2937 !important; }
-            .dark\\:bg-gray-900 { background-color: #111827 !important; }
-            .dark\\:bg-gray-700 { background-color: #374151 !important; }
-            .dark\\:text-gray-100 { color: #f3f4f6 !important; }
-            .dark\\:text-gray-200 { color: #e5e7eb !important; }
-            .dark\\:text-gray-300 { color: #d1d5db !important; }
-            .dark\\:border-gray-700 { border-color: #374151 !important; }
-            .bg-green-500 { background-color: #10b981 !important; }
-            .text-green-500 { color: #10b981 !important; }
-            .bg-blue-50 { background-color: #eff6ff !important; }
-            .border-blue-500 { border-color: #3b82f6 !important; }
-          `;
-          clonedDoc.head.appendChild(style);
-        }
-      });
+      // Remover botões
+      const buttons = content.querySelectorAll("button, .print\\:hidden");
+      buttons.forEach((btn) => btn.remove());
 
-      // Restaurar os botões
-      if (botoesContainer) {
-        (botoesContainer as HTMLElement).style.display = '';
-      }
+      const css = `
+        <style>
+          * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box;
+          }
+          body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #f3f4f6;
+            padding: 20px;
+          }
+          .max-w-4xl { max-width: 56rem; margin: 0 auto; }
+          .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+          .rounded-xl { border-radius: 0.75rem; }
+          .mb-6 { margin-bottom: 1.5rem; }
+          .mb-4 { margin-bottom: 1rem; }
+          .mb-3 { margin-bottom: 0.75rem; }
+          .mb-2 { margin-bottom: 0.5rem; }
+          .mt-2 { margin-top: 0.5rem; }
+          .mt-4 { margin-top: 1rem; }
+          .p-8 { padding: 2rem; }
+          .p-4 { padding: 1rem; }
+          .p-3 { padding: 0.75rem; }
+          .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+          .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+          .gap-4 { gap: 1rem; }
+          .gap-2 { gap: 0.5rem; }
+          .space-y-3 > * + * { margin-top: 0.75rem; }
+          .bg-white { background-color: #ffffff; }
+          .bg-gray-50 { background-color: #f9fafb; }
+          .bg-blue-50 { background-color: #eff6ff; }
+          .bg-green-100 { background-color: #d1fae5; }
+          .bg-green-500 { background-color: #10b981; }
+          .text-gray-800 { color: #1f2937; }
+          .text-gray-700 { color: #374151; }
+          .text-gray-600 { color: #4b5563; }
+          .text-gray-500 { color: #6b7280; }
+          .text-green-500 { color: #10b981; }
+          .text-green-700 { color: #047857; }
+          .text-blue-600 { color: #2563eb; }
+          .border { border-width: 1px; }
+          .border-b { border-bottom-width: 1px; }
+          .border-l-4 { border-left-width: 4px; }
+          .border-gray-200 { border-color: #e5e7eb; }
+          .border-blue-500 { border-color: #3b82f6; }
+          .rounded { border-radius: 0.25rem; }
+          .rounded-lg { border-radius: 0.5rem; }
+          .rounded-full { border-radius: 9999px; }
+          .font-bold { font-weight: 700; }
+          .font-semibold { font-weight: 600; }
+          .font-medium { font-weight: 500; }
+          .text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
+          .text-2xl { font-size: 1.5rem; line-height: 2rem; }
+          .text-xl { font-size: 1.25rem; line-height: 1.75rem; }
+          .text-lg { font-size: 1.125rem; line-height: 1.75rem; }
+          .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+          .text-xs { font-size: 0.75rem; line-height: 1rem; }
+          .flex { display: flex; }
+          .items-center { align-items: center; }
+          .items-baseline { align-items: baseline; }
+          .grid { display: grid; }
+          .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+          .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+          .h-2 { height: 0.5rem; }
+          .w-full { width: 100%; }
+          .max-w-xs { max-width: 20rem; }
+          .flex-1 { flex: 1 1 0%; }
+          @media print {
+            body { background: white; }
+            .shadow-lg { box-shadow: none; }
+          }
+          @media (min-width: 768px) {
+            .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+          }
+        </style>
+      `;
 
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF({
-        orientation: "portrait",
-        unit: "mm",
-        format: "a4",
-      });
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="utf-8">
+            <title>Resultados - ${formulario?.Nome || "Formulário"}</title>
+            ${css}
+          </head>
+          <body>
+            ${content.outerHTML}
+            <script>
+              window.onload = function() {
+                window.print();
+                setTimeout(function() {
+                  window.close();
+                }, 100);
+              };
+            </script>
+          </body>
+        </html>
+      `);
 
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-      const imgWidth = canvas.width;
-      const imgHeight = canvas.height;
-      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-      const imgX = (pdfWidth - imgWidth * ratio) / 2;
-      const imgY = 10;
-
-      const totalPages = Math.ceil((imgHeight * ratio) / pdfHeight);
-
-      for (let i = 0; i < totalPages; i++) {
-        if (i > 0) {
-          pdf.addPage();
-        }
-
-        pdf.addImage(
-          imgData,
-          "PNG",
-          imgX,
-          imgY - (i * pdfHeight),
-          imgWidth * ratio,
-          imgHeight * ratio
-        );
-      }
-
-      const nomeArquivo = `Resultado_${formulario?.Nome.replace(/\s+/g, '_') || "Formulario"}_${
-        new Date().toISOString().split("T")[0]
-      }.pdf`;
-      pdf.save(nomeArquivo);
+      printWindow.document.close();
     } catch (error) {
       console.error("Erro ao gerar PDF:", error);
-      alert("Erro ao gerar PDF. Por favor, tente novamente ou use a função de impressão do navegador (Ctrl+P).");
+      alert(
+        "Erro ao preparar impressão. Use Ctrl+P ou Cmd+P para imprimir diretamente."
+      );
     } finally {
       setGerandoPDF(false);
     }
@@ -309,29 +342,10 @@ export default function ResultadoPage() {
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 py-8 px-6">
-      {/* Estilos inline para garantir compatibilidade com html2canvas */}
-      <style dangerouslySetInnerHTML={{
-        __html: `
-          @media print, (prefers-color-scheme: light) {
-            .pdf-safe-bg-white { background-color: #ffffff !important; }
-            .pdf-safe-bg-gray-50 { background-color: #f9fafb !important; }
-            .pdf-safe-bg-gray-100 { background-color: #f3f4f6 !important; }
-            .pdf-safe-bg-blue-50 { background-color: #eff6ff !important; }
-            .pdf-safe-bg-green-500 { background-color: #10b981 !important; }
-            .pdf-safe-text-gray-800 { color: #1f2937 !important; }
-            .pdf-safe-text-gray-700 { color: #374151 !important; }
-            .pdf-safe-text-gray-600 { color: #4b5563 !important; }
-            .pdf-safe-text-gray-500 { color: #6b7280 !important; }
-            .pdf-safe-text-green-500 { color: #10b981 !important; }
-            .pdf-safe-border-gray-200 { border-color: #e5e7eb !important; }
-            .pdf-safe-border-blue-500 { border-color: #3b82f6 !important; }
-          }
-        `
-      }} />
-      <div className="max-w-4xl mx-auto" ref={relatorioRef} data-pdf-content>
+      <div className="max-w-4xl mx-auto" ref={relatorioRef}>
         {/* Cabeçalho */}
-        <div className="pdf-safe-bg-white dark:bg-gray-800 shadow-lg rounded-xl p-8 mb-6">
-          <h1 className="text-3xl font-bold pdf-safe-text-gray-800 dark:text-gray-100 mb-2">
+        <div className="bg-white dark:bg-gray-800 shadow-lg rounded-xl p-8 mb-6">
+          <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">
             Resultados: {formulario.Nome}
           </h1>
           {formulario.descricao && (
@@ -340,7 +354,8 @@ export default function ResultadoPage() {
             </p>
           )}
           <div className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-            Relatório gerado em: {new Date().toLocaleDateString("pt-BR", {
+            Relatório gerado em:{" "}
+            {new Date().toLocaleDateString("pt-BR", {
               day: "2-digit",
               month: "long",
               year: "numeric",
