@@ -18,13 +18,7 @@
     "@strapi/plugin-cloud": "5.23.1",
     "@strapi/plugin-users-permissions": "5.23.1",
     "@strapi/strapi": "5.23.1",
-    "pg": "^8.8.0",
-    "postgres": "^3.4.7",
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0",
-    "react-router-dom": "^6.0.0",
-    "strapi-plugin-entity-relationship-chart": "^3.1.0",
-    "styled-components": "^6.0.0"
+    "pg": "^8.8.0"
   },
   "engines": {
     "node": ">=18.0.0 <=22.x.x",
@@ -32,6 +26,6 @@
   },
   "strapi": {
     "uuid": "d1e55abe-b553-4d78-933b-e76d75d07915",
-    "installId": "182a89c0643450e7227184a1b738dc8f94fc53de3713df1d944e59ab432a788a"
+    "installId": "182a89c0643450e7227184a1b738dc8f94fc53de3T13df1d944e59ab432a788a"
   }
 }
