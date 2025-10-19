@@ -137,6 +137,8 @@ export default function ResultadoPage() {
 
     form.fators?.forEach((fator) => {
       const facetasResultado: ResultadoFaceta[] = [];
+      // Array para guardar TODAS as respostas de um fator
+      const respostasFator: Resposta[] = []; 
 
       fator.facetas?.forEach((faceta) => {
         const respostasFaceta = respostas.filter(
@@ -144,34 +146,38 @@ export default function ResultadoPage() {
         );
 
         if (respostasFaceta.length > 0) {
-          const soma = respostasFaceta.reduce((acc, r) => acc + r.valor, 0);
-          const media = soma / respostasFaceta.length;
+          // 1. Adiciona as respostas da faceta ao array geral do fator
+          respostasFator.push(...respostasFaceta);
+
+          // 2. Calcula a média da faceta (como antes)
+          const somaFaceta = respostasFaceta.reduce((acc, r) => acc + r.valor, 0);
+          const mediaFaceta = somaFaceta / respostasFaceta.length;
 
           facetasResultado.push({
             id: faceta.id,
             nome: faceta.nome,
-            media: Number(media.toFixed(2)),
+            media: Number(mediaFaceta.toFixed(2)),
             respostas: respostasFaceta,
           });
         }
       });
 
-      if (facetasResultado.length > 0) {
-        const somaFator = facetasResultado.reduce((acc, f) => acc + f.media, 0);
-        const mediaFator = somaFator / facetasResultado.length;
+      // 3. Agora, calcula a média do FATOR usando todas as suas respostas
+      if (respostasFator.length > 0) {
+        const somaFator = respostasFator.reduce((acc, r) => acc + r.valor, 0);
+        const mediaFator = somaFator / respostasFator.length;
 
         resultados.push({
           id: fator.id,
           nome: fator.nome,
           media: Number(mediaFator.toFixed(2)),
-          facetas: facetasResultado,
+          facetas: facetasResultado, // Facetas com suas próprias médias
         });
       }
     });
 
     return resultados;
   }
-
   const handleRefazer = async () => {
     if (documentId) {
       await limparRespostas(documentId as string);

@@ -43,6 +43,7 @@ export async function carregarRespostas(
   return data;
 }
 
+// Esta é a única função 'limparRespostas' que deve existir
 export async function limparRespostas(formId: string) {
   await localforage.removeItem(`formulario_respostas_${formId}`);
 }
