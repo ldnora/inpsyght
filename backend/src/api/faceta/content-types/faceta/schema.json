@@ -1,0 +1,34 @@
+{
+  "kind": "collectionType",
+  "collectionName": "facetas",
+  "info": {
+    "singularName": "faceta",
+    "pluralName": "facetas",
+    "displayName": "Faceta"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "id_faceta": {
+      "type": "uid"
+    },
+    "nome": {
+      "type": "string"
+    },
+    "descricao": {
+      "type": "text"
+    },
+    "perguntas": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::pergunta.pergunta"
+    },
+    "feedback_geral": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::feedback-geral.feedback-geral"
+    }
+  }
+}

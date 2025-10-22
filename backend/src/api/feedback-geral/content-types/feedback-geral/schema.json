@@ -1,0 +1,27 @@
+{
+  "kind": "collectionType",
+  "collectionName": "feedbacks_gerais",
+  "info": {
+    "singularName": "feedback-geral",
+    "pluralName": "feedbacks-gerais",
+    "displayName": "feedback_geral"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "id_feedback_geral": {
+      "type": "uid"
+    },
+    "feedback_geral_baixo": {
+      "type": "richtext"
+    },
+    "feedback_geral_medio": {
+      "type": "blocks"
+    },
+    "feedback_geral_alto": {
+      "type": "blocks"
+    }
+  }
+}
