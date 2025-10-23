@@ -52,10 +52,6 @@ type FormularioAPI = {
   fators?: FatorAPI[];
 };
 
-type FormularioResponse = {
-  data: FormularioAPI;
-};
-
 type ResultadoFaceta = {
   id: string;
   nome: string;
