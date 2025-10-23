@@ -422,8 +422,7 @@ export interface ApiFatorFator extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    facetas: Schema.Attribute.Relation<'oneToMany', 'api::faceta.faceta'> &
-      Schema.Attribute.Private;
+    facetas: Schema.Attribute.Relation<'oneToMany', 'api::faceta.faceta'>;
     formularios: Schema.Attribute.Relation<
       'manyToMany',
       'api::formulario.formulario'

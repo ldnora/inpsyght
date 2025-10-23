@@ -14,13 +14,18 @@ services:
       ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET}
       STRAPI_LOG_LEVEL: debug
     volumes:
+      # Volumes de código para hot-reloading (CORRETO)
       - ./inpsyght-backend/config:/opt/app/config
       - ./inpsyght-backend/src:/opt/app/src
-      - ./inpsyght-backend/package.json:/opt/inpsyght-backend/package.json
-      - ./inpsyght-backend/package-lock.json:/opt/inpsyght-backend/package-lock.json
+      # Volume para o .env (CORRETO)
       - .env:/opt/app/.env
+      # Volume para uploads persistentes (CORRETO)
       - ./inpsyght-backend/public/uploads:/opt/app/public/uploads
-      - ./inpsyght-backend/config/certs/supabase-ca.crt:/opt/app/certs/supabase-ca.crt
+
+      # LINHAS PROBLEMÁTICAS REMOVIDAS:
+      # - ./inpsyght-backend/package.json:/opt/inpsyght-backend/package.json (ERRADO E DESNECESSÁRIO)
+      # - ./inpsyght-backend/package-lock.json:/opt/inpsyght-backend/package-lock.json (ERRADO E DESNECESSÁRIO)
+      # - ./inpsyght-backend/config/certs/supabase-ca.crt:/opt/app/certs/supabase-ca.crt (DESNECESSÁRIO)
     ports:
       - '1337:1337'
     networks:

@@ -13,7 +13,7 @@ export default function Home() {
       <p className="text-gray-700 text-center max-w-2xl mb-8 leading-relaxed">
         Responda ao questionário baseado no modelo dos 
         <strong> Cinco Grandes Fatores da Personalidade (Big Five)</strong> 
-        e descubra mais sobre seus traços de personalidade.
+         e descubra mais sobre seus traços de personalidade.
       </p>
 
       {/* Ações principais */}
