@@ -24,6 +24,12 @@ RUN chown -R node:node /opt/app
 # Mudar para o usuário não-root
 USER node
 
+# --- A CORREÇÃO ESTÁ AQUI ---
+# Define o diretório HOME para o usuário 'node'
+# Isso corrige o erro "mkdir '/home/node/.npm'"
+ENV HOME=/opt/app
+# --- FIM DA CORREÇÃO ---
+
 # Construir a aplicação
 RUN ["npm", "run", "build"]
 

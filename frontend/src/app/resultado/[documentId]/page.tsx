@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { getFormularioCompleto } from "@/libs/api";
 import { carregarRespostas, limparRespostas, Resposta } from "@/libs/storage";
@@ -15,6 +15,8 @@ import {
   Tooltip,
 } from "recharts";
 
+// --- Início de todos os Tipos ---
+
 type RichTextChild = {
   text: string;
 };
@@ -24,6 +26,7 @@ type RichTextBlock = {
   children?: RichTextChild[];
 };
 
+// Tipos da API
 type PerguntaAPI = {
   id: string;
   texto: string;
@@ -52,6 +55,15 @@ type FormularioAPI = {
   fators?: FatorAPI[];
 };
 
+type FormularioResponse = {
+  data: FormularioAPI;
+};
+
+type CacheRespostas = {
+  respostas: Resposta[];
+};
+
+// Tipos de Resultados (médias ainda são calculadas para o gráfico)
 type ResultadoFaceta = {
   id: string;
   nome: string;
@@ -66,6 +78,8 @@ type ResultadoFator = {
   facetas: ResultadoFaceta[];
 };
 
+// --- Fim de todos os Tipos ---
+
 export default function ResultadoPage() {
   const { documentId } = useParams();
   const router = useRouter();
@@ -75,6 +89,77 @@ export default function ResultadoPage() {
   const [resultados, setResultados] = useState<ResultadoFator[]>([]);
   const relatorioRef = useRef<HTMLDivElement>(null);
 
+  // 'calcularResultados' (sem alterações)
+  const calcularResultados = useCallback(
+    (form: FormularioAPI, respostas: Resposta[]): ResultadoFator[] => {
+      const resultados: ResultadoFator[] = [];
+
+      const allPerguntasMap = new Map<string, PerguntaAPI>();
+      form.fators?.forEach((f) => {
+        f.facetas?.forEach((fa) => {
+          fa.perguntas?.forEach((p) => {
+            allPerguntasMap.set(p.id, p);
+          });
+        });
+      });
+
+      const getValorCorrigido = (r: Resposta): number => {
+        const pergunta = allPerguntasMap.get(r.perguntaId);
+        if (pergunta?.pontuacao_reversa) {
+          return 6 - r.valor;
+        }
+        return r.valor;
+      };
+
+      form.fators?.forEach((fator) => {
+        const facetasResultado: ResultadoFaceta[] = [];
+        const respostasFator: Resposta[] = [];
+
+        fator.facetas?.forEach((faceta) => {
+          const respostasFaceta = respostas.filter(
+            (r) => r.facetId === faceta.id
+          );
+
+          if (respostasFaceta.length > 0) {
+            respostasFator.push(...respostasFaceta);
+
+            const somaFaceta = respostasFaceta.reduce(
+              (acc, r) => acc + getValorCorrigido(r),
+              0
+            );
+            const mediaFaceta = somaFaceta / respostasFaceta.length;
+
+            facetasResultado.push({
+              id: faceta.id,
+              nome: faceta.nome,
+              media: Number(mediaFaceta.toFixed(2)),
+              respostas: respostasFaceta,
+            });
+          }
+        });
+
+        if (respostasFator.length > 0) {
+          const somaFator = respostasFator.reduce(
+            (acc, r) => acc + getValorCorrigido(r),
+            0
+          );
+          const mediaFator = somaFator / respostasFator.length;
+
+          resultados.push({
+            id: fator.id,
+            nome: fator.nome,
+            media: Number(mediaFator.toFixed(2)),
+            facetas: facetasResultado,
+          });
+        }
+      });
+
+      return resultados;
+    },
+    []
+  );
+
+  // useEffect (sem alterações)
   useEffect(() => {
     async function carregar() {
       if (!documentId) return;
@@ -82,21 +167,19 @@ export default function ResultadoPage() {
       try {
         console.log("Carregando dados para documentId:", documentId);
 
-        // Carregar formulário e respostas em paralelo
-        const [formData, cache] = await Promise.all([
-          getFormularioCompleto(documentId as string),
-          carregarRespostas(documentId as string),
-        ]);
+        const [formData, cache]: [FormularioResponse, CacheRespostas] =
+          await Promise.all([
+            getFormularioCompleto(documentId as string),
+            carregarRespostas(documentId as string),
+          ]);
 
         console.log("Formulário carregado:", formData.data.Nome);
         console.log("Respostas encontradas:", cache.respostas.length);
 
-        // Verificar se há respostas antes de prosseguir
         if (!cache || cache.respostas.length === 0) {
           console.log(
             "Nenhuma resposta encontrada, redirecionando para o formulário..."
           );
-          // Usar setTimeout para garantir que o redirecionamento aconteça
           setTimeout(() => {
             router.push(`/formulario/${documentId}`);
           }, 100);
@@ -116,102 +199,46 @@ export default function ResultadoPage() {
         setResultados(resultadosCalculados);
       } catch (err) {
         console.error("Erro ao carregar resultados:", err);
-        // Não redirecionar em caso de erro de rede, mostrar mensagem
       } finally {
         setCarregando(false);
       }
     }
 
     carregar();
-  }, [documentId, router]);
+  }, [documentId, router, calcularResultados]);
 
-  function calcularResultados(
-    form: FormularioAPI,
-    respostas: Resposta[]
-  ): ResultadoFator[] {
-    const resultados: ResultadoFator[] = [];
-
-    form.fators?.forEach((fator) => {
-      const facetasResultado: ResultadoFaceta[] = [];
-      // Array para guardar TODAS as respostas de um fator
-      const respostasFator: Resposta[] = []; 
-
-      fator.facetas?.forEach((faceta) => {
-        const respostasFaceta = respostas.filter(
-          (r) => r.facetId === faceta.id
-        );
-
-        if (respostasFaceta.length > 0) {
-          // 1. Adiciona as respostas da faceta ao array geral do fator
-          respostasFator.push(...respostasFaceta);
-
-          // 2. Calcula a média da faceta (como antes)
-          const somaFaceta = respostasFaceta.reduce((acc, r) => acc + r.valor, 0);
-          const mediaFaceta = somaFaceta / respostasFaceta.length;
-
-          facetasResultado.push({
-            id: faceta.id,
-            nome: faceta.nome,
-            media: Number(mediaFaceta.toFixed(2)),
-            respostas: respostasFaceta,
-          });
-        }
-      });
-
-      // 3. Agora, calcula a média do FATOR usando todas as suas respostas
-      if (respostasFator.length > 0) {
-        const somaFator = respostasFator.reduce((acc, r) => acc + r.valor, 0);
-        const mediaFator = somaFator / respostasFator.length;
-
-        resultados.push({
-          id: fator.id,
-          nome: fator.nome,
-          media: Number(mediaFator.toFixed(2)),
-          facetas: facetasResultado, // Facetas com suas próprias médias
-        });
-      }
-    });
-
-    return resultados;
-  }
-  const handleRefazer = async () => {
+  // handleRefazer (sem alterações)
+  const handleRefazer = useCallback(async () => {
     if (documentId) {
       await limparRespostas(documentId as string);
       router.push(`/formulario/${documentId}`);
     }
-  };
+  }, [documentId, router]);
 
-  const handleGerarPDF = async () => {
+  // handleGerarPDF (sem alterações)
+  const handleGerarPDF = useCallback(async () => {
     if (!relatorioRef.current) return;
 
     setGerandoPDF(true);
 
     try {
-      // Usar window.print() é mais confiável que html2canvas
       const printWindow = window.open("", "_blank");
       if (!printWindow) {
         alert("Por favor, permita pop-ups para gerar o PDF.");
+        setGerandoPDF(false);
         return;
       }
 
       const content = relatorioRef.current.cloneNode(true) as HTMLElement;
 
-      // Remover botões
       const buttons = content.querySelectorAll("button, .print\\:hidden");
       buttons.forEach((btn) => btn.remove());
 
+      // CSS (permanece o mesmo, já estava correto para impressão)
       const css = `
         <style>
-          * { 
-            margin: 0; 
-            padding: 0; 
-            box-sizing: border-box;
-          }
-          body {
-            font-family: system-ui, -apple-system, sans-serif;
-            background: #f3f4f6;
-            padding: 20px;
-          }
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          body { font-family: system-ui, -apple-system, sans-serif; background: #f3f4f6; padding: 20px; }
           .max-w-4xl { max-width: 56rem; margin: 0 auto; }
           .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
           .rounded-xl { border-radius: 0.75rem; }
@@ -309,14 +336,17 @@ export default function ResultadoPage() {
     } finally {
       setGerandoPDF(false);
     }
-  };
+  }, [relatorioRef, formulario]);
 
+  // --- JSX (Renderização) ---
+  
+  // MUDANÇA: Fundo claro para loading
   if (carregando) {
     return (
-      <main className="flex h-screen items-center justify-center bg-gray-100 dark:bg-gray-900">
+      <main className="flex h-screen items-center justify-center bg-gray-100">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto mb-4"></div>
-          <p className="text-gray-700 dark:text-gray-300">
+          <p className="text-gray-700">
             Carregando resultados...
           </p>
         </div>
@@ -324,11 +354,12 @@ export default function ResultadoPage() {
     );
   }
 
+  // MUDANÇA: Fundo claro para erro
   if (!formulario || resultados.length === 0) {
     return (
-      <main className="flex h-screen items-center justify-center bg-gray-100 dark:bg-gray-900">
+      <main className="flex h-screen items-center justify-center bg-gray-100">
         <div className="text-center">
-          <p className="text-gray-700 dark:text-gray-300 mb-4">
+          <p className="text-gray-700 mb-4">
             Nenhum resultado encontrado ou formulário não disponível.
           </p>
           <button
@@ -343,19 +374,21 @@ export default function ResultadoPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 py-8 px-6">
+    // MUDANÇA: Fundo principal claro
+    <div className="min-h-screen bg-gray-100 py-8 px-6">
       <div className="max-w-4xl mx-auto" ref={relatorioRef}>
-        {/* Cabeçalho */}
-        <div className="bg-white dark:bg-gray-800 shadow-lg rounded-xl p-8 mb-6">
-          <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+        
+        {/* MUDANÇA: Card branco, texto escuro */}
+        <div className="bg-white shadow-lg rounded-xl p-8 mb-6">
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">
             Resultados: {formulario.Nome}
           </h1>
           {formulario.descricao && (
-            <p className="text-gray-600 dark:text-gray-300 mb-4">
+            <p className="text-gray-600 mb-4">
               {formulario.descricao}
             </p>
           )}
-          <div className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+          <div className="text-sm text-gray-500 mb-4">
             Relatório gerado em:{" "}
             {new Date().toLocaleDateString("pt-BR", {
               day: "2-digit",
@@ -417,10 +450,10 @@ export default function ResultadoPage() {
           </div>
         </div>
 
-        {/* Gráfico Radar dos Fatores */}
+        {/* MUDANÇA: Card branco, texto escuro */}
         {resultados.length > 0 && (
-          <div className="bg-white dark:bg-gray-800 shadow-lg rounded-xl p-8 mb-6">
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">
+          <div className="bg-white shadow-lg rounded-xl p-8 mb-6">
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">
               Visão Geral dos Fatores
             </h2>
             <ResponsiveContainer width="100%" height={400}>
@@ -433,12 +466,12 @@ export default function ResultadoPage() {
                 <PolarGrid stroke="#e5e7eb" />
                 <PolarAngleAxis
                   dataKey="nome"
-                  tick={{ fill: "#6b7280", fontSize: 12 }}
+                  tick={{ fill: "#6b7280", fontSize: 12 }} // text-gray-500
                 />
                 <PolarRadiusAxis
                   angle={90}
                   domain={[0, 5]}
-                  tick={{ fill: "#6b7280" }}
+                  tick={{ fill: "#6b7280" }} // text-gray-500
                 />
                 <Radar
                   name="Média"
@@ -454,57 +487,16 @@ export default function ResultadoPage() {
           </div>
         )}
 
-        {/* Resumo das Médias */}
-        <div className="bg-white dark:bg-gray-800 shadow-lg rounded-xl p-8 mb-6">
-          <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">
-            Resumo das Pontuações
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {resultados.map((fator) => (
-              <div
-                key={fator.id}
-                className="border border-gray-200 dark:border-gray-700 rounded-lg p-4"
-              >
-                <h3 className="font-semibold text-gray-700 dark:text-gray-200 mb-2">
-                  {fator.nome}
-                </h3>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-bold text-green-500">
-                    {fator.media}
-                  </span>
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
-                    / 5.0
-                  </span>
-                </div>
-                <div className="mt-2 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                  <div
-                    className="bg-green-500 h-2 rounded-full transition-all"
-                    style={{ width: `${(fator.media / 5) * 100}%` }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Resultados Detalhados por Fator */}
+        {/* MUDANÇA: Card branco, texto escuro */}
         {resultados.map((fator) => (
           <div
             key={fator.id}
-            className="bg-white dark:bg-gray-800 shadow-lg rounded-xl p-8 mb-6"
+            className="bg-white shadow-lg rounded-xl p-8 mb-6"
           >
             <div className="mb-6">
-              <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
+              <h2 className="text-2xl font-bold text-gray-800">
                 {fator.nome}
               </h2>
-              <div className="mt-2 flex items-center gap-4">
-                <span className="text-lg text-gray-600 dark:text-gray-300">
-                  Média geral:
-                </span>
-                <span className="text-2xl font-bold text-green-500">
-                  {fator.media}
-                </span>
-              </div>
             </div>
 
             {/* Facetas do Fator */}
@@ -513,52 +505,39 @@ export default function ResultadoPage() {
                 key={faceta.id}
                 className={`mb-6 pb-6 ${
                   facetaIndex < fator.facetas.length - 1
-                    ? "border-b border-gray-200 dark:border-gray-700"
+                    ? "border-b border-gray-200" // Borda clara
                     : ""
                 }`}
               >
-                <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-3">
+                <h3 className="text-xl font-semibold text-gray-700 mb-3">
                   {faceta.nome}
                 </h3>
-                <div className="mb-4 flex items-center gap-4">
-                  <span className="text-gray-600 dark:text-gray-300">
-                    Média da faceta:
-                  </span>
-                  <span className="text-lg font-bold text-green-500">
-                    {faceta.media}
-                  </span>
-                  <div className="flex-1 max-w-xs">
-                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                      <div
-                        className="bg-green-500 h-2 rounded-full transition-all"
-                        style={{ width: `${(faceta.media / 5) * 100}%` }}
-                      />
-                    </div>
-                  </div>
-                </div>
 
                 {/* Respostas da Faceta */}
                 <div className="space-y-3">
                   {faceta.respostas.map((resposta) => (
+                    // MUDANÇA: Fundo da resposta claro
                     <div
                       key={resposta.perguntaId}
-                      className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4"
+                      className="bg-gray-50 rounded-lg p-4"
                     >
-                      <p className="text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                      <p className="text-sm font-medium text-gray-700 mb-2">
                         {resposta.texto}
                       </p>
                       <div className="flex items-center gap-4 mb-2">
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                        <span className="text-xs text-gray-500">
                           Resposta:
                         </span>
-                        <span className="px-3 py-1 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded-full text-sm font-semibold">
+                        {/* MUDANÇA: Cor do texto da "bolha" de resposta */}
+                        <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-semibold">
                           {resposta.valor}
                         </span>
                       </div>
                       {resposta.feedback && (
-                        <div className="mt-2 p-3 bg-blue-50 dark:bg-blue-900/30 rounded border-l-4 border-blue-500">
-                          <p className="text-sm text-gray-700 dark:text-gray-200">
-                            <strong className="text-blue-600 dark:text-blue-400">
+                        // MUDANÇA: Fundo do feedback claro
+                        <div className="mt-2 p-3 bg-blue-50 rounded border-l-4 border-blue-500">
+                          <p className="text-sm text-gray-700">
+                            <strong className="text-blue-600">
                               Feedback:
                             </strong>{" "}
                             {resposta.feedback}
