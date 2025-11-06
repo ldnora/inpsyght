@@ -11,3 +11,7 @@ Acess the frontend in: [http://localhost:3000](http://localhost:3000)
 Acess the backen [here](https://inpsyght.onrender.com/admin)
 
 Acess the frontend [here](https://inpsyght.vercel.app/)
+
+# Sync from the original repo
+
+`git syncupstream`

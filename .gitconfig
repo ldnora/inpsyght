@@ -1,1 +1,4 @@
+[alias]
+    syncupstream = !git fetch upstream && git merge -X theirs upstream/main && git push origin main
+
 git config --global alias.syncupstream '!git fetch upstream && git merge -X theirs upstream/main && git push origin main'
