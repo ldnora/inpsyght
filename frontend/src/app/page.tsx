@@ -25,13 +25,6 @@ export default function Home() {
         >
           Iniciar Questionário
         </Link>
-        <Link
-          href="/historico"
-          className="bg-gray-200 hover:bg-gray-300 focus:ring-2 focus:ring-gray-500 focus:outline-none
-                     text-gray-900 px-6 py-3 rounded-lg shadow-md transition font-medium"
-        >
-          Ver Histórico
-        </Link>
       </nav>
     </main>
   );
