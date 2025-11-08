@@ -33,19 +33,23 @@ export default function Header() {
                 href="/formulario"
                 aria-current={pathname === "/formulario" ? "page" : undefined}
                 className={`hover:underline focus:outline-none focus:ring-2 focus:ring-yellow-400 px-2 py-1 rounded 
-                  ${pathname === "/formulario" ? "font-semibold underline" : ""}`}
+                  ${
+                    pathname === "/formulario" ? "font-semibold underline" : ""
+                  }`}
               >
                 Questionário
               </Link>
             </li>
             <li>
               <Link
-                href="/historico"
-                aria-current={pathname === "/historico" ? "page" : undefined}
+                href="/sobre"
+                aria-current={pathname === "/sobre" ? "page" : undefined}
                 className={`hover:underline focus:outline-none focus:ring-2 focus:ring-yellow-400 px-2 py-1 rounded 
-                  ${pathname === "/historico" ? "font-semibold underline" : ""}`}
+                  ${
+                    pathname === "/sobre" ? "font-semibold underline" : ""
+                  }`}
               >
-                Histórico
+                Sobre
               </Link>
             </li>
           </ul>

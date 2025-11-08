@@ -40,7 +40,7 @@ export default function FormularioPage() {
 
       {/* Texto explicativo */}
       <p className="text-gray-700 text-center max-w-2xl mb-8 leading-relaxed">
-        Escolha abaixo qual formulário deseja responder. Cada formulário contém
+        Escolha abaixo qual formulário de qual centro deseja responder. Cada formulário contém
         perguntas sobre os cinco grandes fatores da personalidade, suas facetas
         e características. O formulário foi criado com o objetivo de ser uma
         ferramenta de autoconhecimento para os alunos dos diversos centros da
