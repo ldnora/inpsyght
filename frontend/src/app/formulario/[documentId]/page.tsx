@@ -444,22 +444,6 @@ export default function FormularioPage() {
           Este formulário é uma ferramenta de autoavaliação. 
           Suas respostas não são armazenadas em nossos servidores e ficam salvas apenas no seu navegador.
         </p>
-        {/* MUDANÇA APLICADA AQUI */}
-        <p className="mt-2">
-          Em caso de dúvidas, entre em contato com a CAED: 
-          <a href="mailto:caed@ufsm.br" className="underline hover:text-gray-700 ml-1">
-            caed@ufsm.br
-          </a>
-          <span className="mx-1">|</span>
-          <a 
-            href="https://www.ufsm.br/pro-reitorias/prograd/caed" 
-            target="_blank" 
-            rel="noopener noreferrer" 
-            className="underline hover:text-gray-700"
-          >
-            Site da CAED
-          </a>
-        </p>
       </footer>
     </div>
   );

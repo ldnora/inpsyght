@@ -40,18 +40,6 @@ export default function Header() {
                 Questionário
               </Link>
             </li>
-            <li>
-              <Link
-                href="/sobre"
-                aria-current={pathname === "/sobre" ? "page" : undefined}
-                className={`hover:underline focus:outline-none focus:ring-2 focus:ring-yellow-400 px-2 py-1 rounded 
-                  ${
-                    pathname === "/sobre" ? "font-semibold underline" : ""
-                  }`}
-              >
-                Sobre
-              </Link>
-            </li>
           </ul>
         </nav>
       </div>
